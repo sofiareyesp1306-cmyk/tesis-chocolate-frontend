@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Cacaosuyo – Análisis de Chocolate</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f5f0e8;
+      color: #2c1a05;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 20px;
+    }
+
+    h1 {
+      font-size: 2rem;
+      color: #8b5e1a;
+      margin-bottom: 6px;
+      letter-spacing: 1px;
+    }
+
+    .subtitle {
+      color: #a07840;
+      font-size: 0.9rem;
+      margin-bottom: 40px;
+    }
+
+    .card {
+      background: #ffffff;
+      border: 1px solid #d4b896;
+      border-radius: 12px;
+      padding: 32px;
+      width: 100%;
+      max-width: 480px;
+      margin-bottom: 24px;
+      box-shadow: 0 2px 12px rgba(139,94,26,0.08);
+    }
+
+    .card h2 {
+      font-size: 1.1rem;
+      color: #8b5e1a;
+      margin-bottom: 20px;
+      border-bottom: 1px solid #e8d5b8;
+      padding-bottom: 10px;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 0;
+      margin-bottom: 24px;
+      border-bottom: 1px solid #e8d5b8;
+    }
+
+    .tab {
+      flex: 1;
+      padding: 10px;
+      text-align: center;
+      cursor: pointer;
+      color: #a07840;
+      font-size: 0.9rem;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
+    }
+
+    .tab.active {
+      color: #8b5e1a;
+      border-bottom: 2px solid #8b5e1a;
+    }
+
+    label {
+      display: block;
+      font-size: 0.82rem;
+      color: #7a5530;
+      margin-bottom: 4px;
+      margin-top: 14px;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    select {
+      width: 100%;
+      padding: 10px 12px;
+      background: #faf6f0;
+      border: 1px solid #d4b896;
+      border-radius: 8px;
+      color: #2c1a05;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    input:focus, select:focus {
+      border-color: #8b5e1a;
+    }
+
+    button {
+      margin-top: 20px;
+      width: 100%;
+      padding: 12px;
+      background: #8b5e1a;
+      color: #ffffff;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    button:hover { background: #a07020; }
+    button:disabled { background: #c8b090; color: #ffffff; cursor: not-allowed; }
+
+    .msg {
+      margin-top: 14px;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 0.88rem;
+    }
+
+    .msg.error { background: #fde8e8; color: #c0392b; border: 1px solid #f5b8b8; }
+    .msg.success { background: #e8f5e8; color: #27ae60; border: 1px solid #b8e0b8; }
+    .msg.info { background: #e8f0fd; color: #2471a3; border: 1px solid #b8d0f5; }
+
+    .upload-area {
+      border: 2px dashed #d4b896;
+      border-radius: 10px;
+      padding: 30px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+      margin-top: 14px;
+      position: relative;
+      background: #faf6f0;
+    }
+
+    .upload-area:hover, .upload-area.dragover {
+      border-color: #8b5e1a;
+      background: #f5ede0;
+    }
+
+    .upload-area input[type="file"] {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+      width: 100%;
+      height: 100%;
+    }
+
+    .upload-icon { font-size: 2.5rem; margin-bottom: 8px; }
+    .upload-text { color: #a07840; font-size: 0.9rem; }
+    .upload-filename { color: #8b5e1a; font-size: 0.9rem; margin-top: 8px; font-weight: 600; }
+
+    #preview-img {
+      max-width: 100%;
+      max-height: 200px;
+      border-radius: 8px;
+      margin-top: 14px;
+      display: none;
+    }
+
+    .json-box {
+      background: #f5f0e8;
+      border: 1px solid #d4b896;
+      border-radius: 8px;
+      padding: 16px;
+      margin-top: 16px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.82rem;
+      white-space: pre-wrap;
+      word-break: break-word;
+      max-height: 350px;
+      overflow-y: auto;
+      color: #2c5f2e;
+      display: none;
+    }
+
+    .btn-secondary {
+      background: #f5ede0;
+      color: #8b5e1a;
+      border: 1px solid #d4b896;
+      margin-top: 10px;
+    }
+    .btn-secondary:hover { background: #ede0cc; }
+
+    .btn-download {
+      background: #e8f5e8;
+      color: #27ae60;
+      border: 1px solid #b8e0b8;
+      margin-top: 10px;
+      display: none;
+    }
+    .btn-download:hover { background: #d0ecd0; }
+
+    .btn-danger {
+      background: #fde8e8;
+      color: #c0392b;
+      border: 1px solid #f5b8b8;
+      margin-top: 10px;
+    }
+    .btn-danger:hover { background: #fad0d0; }
+
+    .divider {
+      border: none;
+      border-top: 1px solid #e8d5b8;
+      margin: 20px 0 0 0;
+    }
+
+    .hidden { display: none !important; }
+
+    .tag-logged {
+      font-size: 0.8rem;
+      color: #27ae60;
+      background: #e8f5e8;
+      border: 1px solid #b8e0b8;
+      border-radius: 20px;
+      padding: 3px 12px;
+      display: inline-block;
+      margin-bottom: 16px;
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 16px; height: 16px;
+      border: 2px solid #ffffff;
+      border-top-color: transparent;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      margin-right: 8px;
+      vertical-align: middle;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .result-actions {
+      display: none;
+      flex-direction: column;
+      gap: 0;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🍫 Cacaosuyo</h1>
+  <p class="subtitle">Análisis de calidad con IA · Producción de chocolate</p>
+
+  <!-- LOGIN / REGISTRO -->
+  <div class="card" id="card-auth">
+    <div class="tabs">
+      <div class="tab active" id="tab-login" onclick="switchTab('login')">Iniciar sesión</div>
+      <div class="tab" id="tab-registro" onclick="switchTab('registro')">Registrarse</div>
+    </div>
+
+    <!-- LOGIN -->
+    <div id="form-login">
+      <label>Correo electrónico</label>
+      <input type="email" id="login-email" placeholder="tucorreo@ejemplo.com" />
+      <label>Contraseña</label>
+      <input type="password" id="login-pass" placeholder="••••••••" />
+      <button onclick="login()">Entrar</button>
+      <div id="login-msg"></div>
+    </div>
+
+    <!-- REGISTRO -->
+    <div id="form-registro" class="hidden">
+      <label>Nombre</label>
+      <input type="text" id="reg-nombre" placeholder="Tu nombre" />
+      <label>Correo electrónico</label>
+      <input type="email" id="reg-email" placeholder="tucorreo@ejemplo.com" />
+      <label>Contraseña</label>
+      <input type="password" id="reg-pass" placeholder="Mínimo 8 caracteres con números" />
+      <button onclick="registrar()">Crear cuenta</button>
+      <div id="reg-msg"></div>
+    </div>
+  </div>
+
+  <!-- UPLOAD -->
+  <div class="card hidden" id="card-upload">
+    <h2>Analizar muestra</h2>
+    <div class="tag-logged" id="user-tag">👤 Usuario</div>
+
+    <label>Etapa de producción</label>
+    <select id="etapa-select">
+      <option value="tostado">🔥 Tostado</option>
+      <option value="refinado">⚙️ Refinado</option>
+      <option value="moldeado">🍫 Moldeado</option>
+    </select>
+
+    <label>Foto de la muestra</label>
+    <div class="upload-area" id="upload-area">
+      <input type="file" id="file-input" accept="image/*" onchange="onFileSelected(event)" />
+      <div class="upload-icon">📷</div>
+      <div class="upload-text">Haz clic o arrastra una foto aquí</div>
+      <div class="upload-filename" id="filename-label"></div>
+    </div>
+
+    <img id="preview-img" alt="Vista previa" />
+
+    <button id="btn-analizar" onclick="analizar()" disabled>Analizar con IA</button>
+    <div id="upload-msg"></div>
+
+    <div class="json-box" id="json-result"></div>
+
+    <div class="result-actions" id="result-actions">
+      <button class="btn-download" id="btn-download" onclick="descargarJSON()" style="display:block; margin-top:10px;">⬇ Descargar JSON</button>
+      <button class="btn-secondary" onclick="nuevaFoto()">📷 Analizar otra foto</button>
+      <hr class="divider" />
+      <button class="btn-danger" onclick="logout()">Cerrar sesión</button>
+    </div>
+
+    <!-- botón cerrar sesión visible siempre (antes de analizar) -->
+    <button class="btn-danger" id="btn-logout-simple" onclick="logout()" style="margin-top:30px;">Cerrar sesión</button>
+  </div>
+
+<script>
+  const API = "https://web-production-0b0f9.up.railway.app";
+  let token = null;
+  let nombreUsuario = "";
+  let ultimoJSON = null;
+  let ultimaEtapa = "";
+
+  function showMsg(id, texto, tipo) {
+    const el = document.getElementById(id);
+    el.className = "msg " + tipo;
+    // Si el mensaje es un array (errores de validación de Pydantic), extrae los textos
+    if (Array.isArray(texto)) {
+      texto = texto.map(e => e.msg || JSON.stringify(e)).join(", ");
+    } else if (typeof texto === "object" && texto !== null) {
+      texto = JSON.stringify(texto);
+    }
+    el.innerHTML = texto;
+    el.style.display = texto ? "block" : "none";
+  }
+
+  function switchTab(tab) {
+    document.getElementById("tab-login").classList.toggle("active", tab === "login");
+    document.getElementById("tab-registro").classList.toggle("active", tab === "registro");
+    document.getElementById("form-login").classList.toggle("hidden", tab !== "login");
+    document.getElementById("form-registro").classList.toggle("hidden", tab !== "registro");
+    showMsg("login-msg", "", "");
+    showMsg("reg-msg", "", "");
+  }
+
+  async function login() {
+    const email = document.getElementById("login-email").value.trim();
+    const pass = document.getElementById("login-pass").value;
+    if (!email || !pass) { showMsg("login-msg", "Completa todos los campos.", "error"); return; }
+    showMsg("login-msg", '<span class="spinner"></span>Ingresando...', "info");
+    try {
+      const resp = await fetch(`${API}/auth/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, contraseña: pass })
+      });
+      const data = await resp.json();
+      if (!resp.ok) { showMsg("login-msg", data.detail || "Error al iniciar sesión.", "error"); return; }
+      entrarApp(data.token, data.nombre);
+    } catch (e) {
+      showMsg("login-msg", "No se pudo conectar con el servidor.", "error");
+    }
+  }
+
+  async function registrar() {
+    const nombre = document.getElementById("reg-nombre").value.trim();
+    const email = document.getElementById("reg-email").value.trim();
+    const pass = document.getElementById("reg-pass").value;
+    if (!nombre || !email || !pass) { showMsg("reg-msg", "Completa todos los campos.", "error"); return; }
+    showMsg("reg-msg", '<span class="spinner"></span>Creando cuenta...', "info");
+    try {
+      const resp = await fetch(`${API}/auth/register`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ nombre, email, contraseña: pass })
+      });
+      const data = await resp.json();
+      if (!resp.ok) { showMsg("reg-msg", data.detail || "Error al registrarse.", "error"); return; }
+      showMsg("reg-msg", "✅ Cuenta creada. Iniciando sesión...", "success");
+      setTimeout(() => {
+        document.getElementById("login-email").value = email;
+        document.getElementById("login-pass").value = pass;
+        switchTab("login");
+        login();
+      }, 1000);
+    } catch (e) {
+      showMsg("reg-msg", "No se pudo conectar con el servidor.", "error");
+    }
+  }
+
+  function entrarApp(tok, nombre) {
+    token = tok;
+    nombreUsuario = nombre;
+    document.getElementById("card-auth").classList.add("hidden");
+    document.getElementById("card-upload").classList.remove("hidden");
+    document.getElementById("user-tag").textContent = "👤 " + nombreUsuario;
+  }
+
+  function onFileSelected(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    document.getElementById("filename-label").textContent = file.name;
+    document.getElementById("btn-analizar").disabled = false;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = document.getElementById("preview-img");
+      img.src = e.target.result;
+      img.style.display = "block";
+    };
+    reader.readAsDataURL(file);
+    document.getElementById("json-result").style.display = "none";
+    document.getElementById("result-actions").style.display = "none";
+    document.getElementById("btn-logout-simple").style.display = "block";
+    showMsg("upload-msg", "", "");
+  }
+
+  // Drag & drop
+  const area = document.getElementById("upload-area");
+  area.addEventListener("dragover", e => { e.preventDefault(); area.classList.add("dragover"); });
+  area.addEventListener("dragleave", () => area.classList.remove("dragover"));
+  area.addEventListener("drop", e => {
+    e.preventDefault();
+    area.classList.remove("dragover");
+    const file = e.dataTransfer.files[0];
+    if (file) {
+      document.getElementById("file-input").files = e.dataTransfer.files;
+      onFileSelected({ target: { files: [file] } });
+    }
+  });
+
+  async function analizar() {
+    const fileInput = document.getElementById("file-input");
+    const etapa = document.getElementById("etapa-select").value;
+    if (!fileInput.files[0]) { showMsg("upload-msg", "Selecciona una foto primero.", "error"); return; }
+    showMsg("upload-msg", '<span class="spinner"></span>Analizando con IA... esto puede tardar unos segundos.', "info");
+    document.getElementById("btn-analizar").disabled = true;
+    document.getElementById("json-result").style.display = "none";
+    document.getElementById("result-actions").style.display = "none";
+    document.getElementById("btn-logout-simple").style.display = "none";
+
+    const formData = new FormData();
+    formData.append("file", fileInput.files[0]);
+    try {
+      const resp = await fetch(`${API}/upload/${etapa}`, {
+        method: "POST",
+        headers: { "Authorization": `Bearer ${token}` },
+        body: formData
+      });
+      const data = await resp.json();
+      if (!resp.ok) {
+        showMsg("upload-msg", data.detail || "Error en el análisis.", "error");
+        document.getElementById("btn-analizar").disabled = false;
+        document.getElementById("btn-logout-simple").style.display = "block";
+        return;
+      }
+      ultimoJSON = data;
+      ultimaEtapa = etapa;
+      const jsonStr = JSON.stringify(data, null, 2);
+      const box = document.getElementById("json-result");
+      box.textContent = jsonStr;
+      box.style.display = "block";
+      document.getElementById("result-actions").style.display = "flex";
+      showMsg("upload-msg", "✅ Análisis completado.", "success");
+    } catch (e) {
+      showMsg("upload-msg", "Error de conexión con el servidor.", "error");
+      document.getElementById("btn-analizar").disabled = false;
+      document.getElementById("btn-logout-simple").style.display = "block";
+    }
+  }
+
+  function nuevaFoto() {
+    document.getElementById("file-input").value = "";
+    document.getElementById("filename-label").textContent = "";
+    document.getElementById("preview-img").style.display = "none";
+    document.getElementById("json-result").style.display = "none";
+    document.getElementById("result-actions").style.display = "none";
+    document.getElementById("btn-logout-simple").style.display = "block";
+    document.getElementById("btn-analizar").disabled = true;
+    showMsg("upload-msg", "", "");
+    ultimoJSON = null;
+  }
+
+  function descargarJSON() {
+    if (!ultimoJSON) return;
+    const blob = new Blob([JSON.stringify(ultimoJSON, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    const fecha = new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-");
+    a.href = url;
+    a.download = `cacaosuyo_${ultimaEtapa}_${fecha}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  function logout() {
+    token = null;
+    nombreUsuario = "";
+    ultimoJSON = null;
+    document.getElementById("card-auth").classList.remove("hidden");
+    document.getElementById("card-upload").classList.add("hidden");
+    document.getElementById("login-email").value = "";
+    document.getElementById("login-pass").value = "";
+    document.getElementById("file-input").value = "";
+    document.getElementById("filename-label").textContent = "";
+    document.getElementById("preview-img").style.display = "none";
+    document.getElementById("json-result").style.display = "none";
+    document.getElementById("result-actions").style.display = "none";
+    document.getElementById("btn-logout-simple").style.display = "block";
+    showMsg("upload-msg", "", "");
+    switchTab("login");
+  }
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && !document.getElementById("card-auth").classList.contains("hidden")) {
+      const tabActivo = document.getElementById("tab-login").classList.contains("active");
+      tabActivo ? login() : registrar();
+    }
+  });
+</script>
+</body>
+</html>
